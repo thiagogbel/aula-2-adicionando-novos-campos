@@ -1,5 +1,6 @@
 package com.example.crud.controllers;
 
+import com.example.crud.domain.product.DistributionCenter;
 import com.example.crud.domain.product.Product;
 import com.example.crud.domain.product.ProductRepository;
 import com.example.crud.domain.product.RequestCategory;
@@ -12,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,6 +28,31 @@ public class ProductController {
     public ResponseEntity<List<Product>> getAllProducts(){
         var allProducts = repository.findAllByActiveTrue();
         return ResponseEntity.ok(allProducts);
+    }
+
+    @GetMapping("/distribution-center/{distributionCenter}")
+    public ResponseEntity<List<Product>> getByDistributionCenter(@PathVariable DistributionCenter distributionCenter){
+        var products = repository.findAllByActiveTrueAndDistributionCenter(distributionCenter);
+        return ResponseEntity.ok(products);
+    }
+
+    // bonus do readme - quantidade de ativos por centro
+    @GetMapping("/distribution-center/count")
+    public ResponseEntity<Map<String, Integer>> countByDistributionCenter(){
+        var products = repository.findAllByActiveTrue();
+        Map<String, Integer> total = new HashMap<>();
+        total.put("RJ", 0);
+        total.put("MG", 0);
+        total.put("SP", 0);
+
+        for (Product product : products) {
+            if (product.getDistributionCenter() != null) {
+                String centro = product.getDistributionCenter().name();
+                total.put(centro, total.get(centro) + 1);
+            }
+        }
+
+        return ResponseEntity.ok(total);
     }
 
     @GetMapping("/category/{categoryAsPath}")
@@ -61,6 +89,7 @@ public class ProductController {
             Product product = optionalProduct.get();
             product.setName(data.name());
             product.setPrice(data.price());
+            product.setDistributionCenter(data.distributionCenter());
             return ResponseEntity.ok(product);
         } else {
             throw new EntityNotFoundException();
