@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findAllByActiveTrue();
+
+    List<Product> findAllByActiveTrueAndDistributionCenter(DistributionCenter distributionCenter);
 }
