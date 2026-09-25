@@ -22,10 +22,16 @@ public class Product {
 
     private String category;
 
+    // STRING grava RJ/MG/SP. ORDINAL gravaria 0,1,2 e quebra se a gente mudar a ordem do enum
+    @Enumerated(EnumType.STRING)
+    @Column(name = "distribution_center")
+    private DistributionCenter distributionCenter;
+
     public Product(RequestProduct requestProduct){
         this.name = requestProduct.name();
         this.price = requestProduct.price();
         this.category = requestProduct.category();
+        this.distributionCenter = requestProduct.distributionCenter();
         this.active = true;
     }
 }
